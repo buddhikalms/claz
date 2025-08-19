@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String             @id @default(cuid())
+  firstName     String
+  lastName      String
+  email         String?            @unique
+  phone         String             @unique
+  phoneVerified Boolean            @default(false)
+  role          Role               @default(STUDENT)
+  emailVerified DateTime?          @map("email_verified")
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  verification  VerificationToken?
+  teacher       Teacher?           @relation("UserTeacher")
+  student       Student?           @relation("UserStudent")
+}
+
+model Teacher {
+  id             String        @id @default(cuid())
+  userId         String        @unique
+  user           User          @relation("UserTeacher", fields: [userId], references: [id], onDelete: Cascade)
+  courses        Course[]      @relation
+  subject        String
+  experience     String
+  rating         Float         @default(0.0)
+  coverImage     String
+  profileImage   String
+  bio            String?       @db.Text
+  qualifications Json
+  subjects       Json
+  schedules      Schedule[]
+  reviews        Review[]      @relation
+  appointments   Appointment[] @relation
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Student {
+  id               String        @id @default(cuid())
+  userId           String        @unique
+  user             User          @relation("UserStudent", fields: [userId], references: [id], onDelete: Cascade)
+  purchasedCourses Course[]      @relation("StudentPurchasedCourses")
+  purchasedLessons Lesson[]      @relation("StudentPurchasedLessons")
+  reviews          Review[]      @relation
+  appointments     Appointment[] @relation
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model Course {
+  id               String           @id @default(uuid())
+  teacherId        String
+  title            String
+  duration         String
+  level            String
+  description      String
+  ageLimit         String?
+  price            Float
+  enrollmentStatus EnrollmentStatus @default(OPEN)
+  image            String
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  teacher          Teacher          @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  schedules        Schedule[]
+  lessons          Lesson[]
+  purchasedBy      Student[]        @relation("StudentPurchasedCourses")
+}
+
+model Lesson {
+  id          String    @id @default(uuid())
+  courseId    String
+  title       String
+  duration    String
+  price       Float
+  content     Json
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  purchasedBy Student[] @relation("StudentPurchasedLessons")
+}
+
+model Subjects {
+  id          String @id @default(uuid())
+  title       String
+  slug        String
+  parent      String
+  icon        String
+  description String
+}
+
+model Schedule {
+  id        String       @id @default(uuid())
+  teacherId String
+  courseId  String?
+  day       String
+  startTime String
+  endTime   String
+  type      ScheduleType @default(AVAILABLE)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  teacher   Teacher      @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  course    Course?      @relation(fields: [courseId], references: [id], onDelete: SetNull)
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  teacherId String
+  studentId String? // Optional to allow migration
+  rating    Float
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  student   Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  id          String      @id @default(uuid())
+  teacherId   String
+  studentId   String
+  date        DateTime
+  startTime   String
+  sessionType SessionType @default(HOUR)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  teacher     Teacher     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  student     Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  token     String
+  expires   DateTime
+  user      User?    @relation(fields: [phone], references: [phone], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@map("verification_tokens")
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum EnrollmentStatus {
+  OPEN
+  CLOSED
+}
+
+enum ScheduleType {
+  SCHEDULED
+  AVAILABLE
+}
+
+enum SessionType {
+  HALF_HOUR
+  HOUR
+  HOUR_AND_HALF
+}

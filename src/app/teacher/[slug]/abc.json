@@ -1,0 +1,41 @@
+[
+  {
+    "day": "Monday",
+    "type": "SCHEDULED",
+    "endTime": "12:00",
+    "courseId": 1,
+    "startTime": "10:00"
+  },
+  {
+    "day": "Monday",
+    "type": "AVAILABLE",
+    "endTime": "14:00",
+    "startTime": "12:00"
+  },
+  {
+    "day": "Wednesday",
+    "type": "SCHEDULED",
+    "endTime": "15:00",
+    "courseId": 2,
+    "startTime": "13:00"
+  },
+  {
+    "day": "Wednesday",
+    "type": "AVAILABLE",
+    "endTime": "17:00",
+    "startTime": "15:00"
+  },
+  {
+    "day": "Friday",
+    "type": "SCHEDULED",
+    "endTime": "11:00",
+    "courseId": 3,
+    "startTime": "09:00"
+  },
+  {
+    "day": "Friday",
+    "type": "AVAILABLE",
+    "endTime": "12:00",
+    "startTime": "11:00"
+  }
+]
