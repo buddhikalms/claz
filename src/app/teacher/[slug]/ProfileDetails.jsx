@@ -237,7 +237,7 @@ export default function TeacherProfile({ details }) {
                 className="w-30 h-30 rounded-full border-4 border-white shadow-lg object-cover"
               />
             ) : (
-              <div className="w-30 h-30 rounded-full bg-gray-200 border-4 border-white shadow-lg" />
+              <div className="w-30 h-30 rounded-full bg-gray-300 border-4 border-white shadow-lg" />
             )}
           </div>
           <div className="pt-20 sm:pt-24 pb-8 px-6 sm:px-12 lg:flex lg:justify-between lg:items-center">
