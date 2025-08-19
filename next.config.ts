@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  /* config options here */
-  images: {
-    domains: ["localhost"], // Add localhost to allowed image domains
-  },
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    domains: ["localhost"], // Add localhost to allowed image domains
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
